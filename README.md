@@ -24,7 +24,7 @@ hit within a few rolls of a fresh boot.
 | file | what it is |
 |---|---|
 | `ghostlock_poc.py` | the runner: fire, survive panics, verify root, shell |
-| `ghostlock` (release) | exploit binary, aarch64 static, `ab14657224` only |
+| `ghostlock` (release) | exploit binary, aarch64 static, stripped; embeds the `ab14657224` offsets; sha256 in the release notes |
 
 ## Notes
 
