@@ -26,8 +26,15 @@ import subprocess
 import sys
 import time
 
-# Reclaim environment (device-proven; see the writeup linked from
-# the README for what each knob is for).
+# Reclaim environment (device-proven; these six values are the tested
+# configuration for this box's 2 GB geometry). Knobs:
+#   CRED_ATTEMPTS       cred-plan attempts per roll
+#   PREPARE_SLABS      slabs pre-seeded before each walk
+#   MOVABLE_STORM_MB    movable-page storm size (THP is madvise here)
+#   PCP_DRAIN_BURST     per-CPU page-list drain bursts per cycle
+#   PCP_COUNT_DRAIN_MB  MB drained per pcp burst
+#   DRAIN_KILLS         victim tasks killed so their pages drop
+# A different RAM geometry needs a re-tune; edit here, re-test.
 ENV = ("CRED_ATTEMPTS=6 PREPARE_SLABS=32 MOVABLE_STORM_MB=128 "
        "PCP_DRAIN_BURST=24 PCP_COUNT_DRAIN_MB=8 DRAIN_KILLS=64")
 

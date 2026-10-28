@@ -35,4 +35,22 @@ hit within a few rolls of a fresh boot.
 - After a hit the framework dies within a minute (writeup: "The cost
   of root"); the box keeps working as a headless appliance.
 
+## Reclaim knobs
+
+The runner fires a fixed, device-proven reclaim environment
+(defined in `ghostlock_poc.py`):
+
+| knob | default | what it tunes |
+|---|---|---|
+| `CRED_ATTEMPTS` | 6 | cred-plan attempts per roll |
+| `PREPARE_SLABS` | 32 | slabs pre-seeded before each walk |
+| `MOVABLE_STORM_MB` | 128 | movable-page storm size |
+| `PCP_DRAIN_BURST` | 24 | per-CPU page-list drain bursts |
+| `PCP_COUNT_DRAIN_MB` | 8 | MB drained per burst |
+| `DRAIN_KILLS` | 64 | victims killed to drop their pages |
+
+The values are the tested configuration for this box's 2 GB geometry;
+the rationale for each is in the writeup. A device with a different
+memory geometry needs a re-tune, which means editing the source.
+
 Authorized research on your own devices only.
