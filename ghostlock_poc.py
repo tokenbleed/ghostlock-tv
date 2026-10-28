@@ -4,8 +4,8 @@
 General runner: no kernel filter. No exploit binary is shipped; the
 exploit binary carries the offsets, so you are responsible for
 building one from the GhostLock family sources and pointing --bin at
-a build that matches the target kernel (see WRITEUP.md for the
-porting method and the family repo list).
+a build that matches the target kernel (see the writeup linked from
+the README for the porting method and the family repo list).
 
 Run model:
   connect -> wait for adb authorization -> wait for boot ->
@@ -27,8 +27,8 @@ import subprocess
 import sys
 import time
 
-# Reclaim environment (device-proven; see WRITEUP.md "The reclaim
-# environment" for what each knob is for).
+# Reclaim environment (device-proven; see the writeup linked from
+# the README for what each knob is for).
 ENV = ("CRED_ATTEMPTS=6 PREPARE_SLABS=32 MOVABLE_STORM_MB=128 "
        "PCP_DRAIN_BURST=24 PCP_COUNT_DRAIN_MB=8 DRAIN_KILLS=64")
 

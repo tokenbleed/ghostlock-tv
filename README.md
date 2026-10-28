@@ -6,29 +6,27 @@ futex PI use-after-free. Target kernel: `ab14657224`
 green, dm-verity enforcing: root is per-boot, there is no persistence
 without breaking the boot chain.
 
-Read `WRITEUP.md` before running anything. It documents the port, the
-write primitive design (including why the SELinux write is a pointer
-write and not the zero write), the reclaim environment, the delivery
-architecture and its dead ends, and the operational findings.
+The full technical writeup (the port, the write primitive design,
+why the SELinux write is a pointer write, the reclaim environment,
+the delivery dead ends, the operational findings) is published at
+**<https://acheronsec.com/research/ghostlock-onn-4k-pro>**. Read it
+before running anything.
 
 ## Repository
 
 - `ghostlock_poc.py` - the runner (Python 3, stdlib only, `adb` on PATH)
-- `WRITEUP.md` - the full technical writeup
-
-**No exploit binary is distributed.** The runner is an orchestrator
-only: it connects, fires the exploit, survives the panic reboots,
-verifies root, and drops into the shell. All the exploitation logic
-(the write primitive, the cred swap, the reclaim environment) lives in
-a compiled binary you must build yourself for the target kernel, from
-the GhostLock family sources listed in WRITEUP.md "Related work".
-Without a matching binary the runner cannot root anything.
+- `ghostlock_r18` - exploit binary (aarch64, static), built for kernel
+  `ab14657224`: download from the releases page, not committed to the
+  tree. It contains no device-specific data (no serials, no network
+  identifiers; verified) and runs on any device with the same kernel
+  build, i.e. any onn 4K Pro on the same OTA level.
 
 ## Usage
 
 ```
 adb connect <device-ip>:5555        # click Allow on the TV popup
-python3 ghostlock_poc.py --host <device-ip>:5555 --bin <exploit-binary>
+# grab the binary from the releases page, then:
+python3 ghostlock_poc.py --host <device-ip>:5555 --bin ghostlock_r18
 ```
 
 Flags:
@@ -41,6 +39,25 @@ Flags:
 - `--env K=V` - extra exploit env, repeatable (e.g.
   `--env GHOST_SELINUX=0` for the cred-swap-only launcher-survival mode)
 - `--no-shell` - do not drop into the interactive root shell
+
+## Building the binary for another kernel
+
+The release binary only works on the `ab14657224` kernel build. For
+any other kernel you must build from the GhostLock family sources
+(the repo list is in the writeup's Related work section) with your own
+per-build offsets: extract them from the device's own `boot.img`
+(`kallsyms`) and rebuild. The build is a static aarch64 cross-compile
+with the Android NDK, no framework dependencies:
+
+```
+aarch64-linux-android35-clang -O2 -static -pthread \
+  <family sources> -o ghostlock
+```
+
+Verify the result the same way this repo's release binary was
+verified: `strings` on the binary for any identifiers that should not
+leave your machine, and a kernel-build check on the target before
+every fire (`--bin` must match `uname -r`).
 
 ## What it does
 
@@ -71,5 +88,6 @@ Flags:
    `selinux_state` bytes flip as the spray page is reused;
    servicemanager returns EINVAL and system_server goes down on its
    next poll). The rooted box keeps working as a headless appliance;
-   see WRITEUP.md "The cost of root". Power-cycle restores stock.
+   see the writeup's "The cost of root" section. Power-cycle restores
+   stock.
 - Authorized research on your own devices only.
