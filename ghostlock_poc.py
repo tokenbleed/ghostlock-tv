@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""GhostLock PoC runner - CVE-2026-43499 (futex PI use-after-free)
+"""ghostlock-tv runner - CVE-2026-43499 (futex PI use-after-free)
 
 General runner: no kernel filter. No exploit binary is shipped; the
 exploit binary carries the offsets, so you are responsible for
@@ -170,7 +170,7 @@ def verify_root(host):
 
 def main():
     p = argparse.ArgumentParser(
-        description="GhostLock PoC runner (CVE-2026-43499 futex PI UAF)")
+        description="ghostlock-tv runner (CVE-2026-43499 futex PI UAF)")
     p.add_argument("--host", required=True,
                    help="adb target host:port (e.g. 192.168.1.50:5555)")
     p.add_argument("--bin", required=True,
@@ -195,7 +195,7 @@ def main():
 
     print()
     print("*" * 70)
-    print("  GhostLock PoC - CVE-2026-43499 (futex PI use-after-free)")
+    print("  ghostlock-tv - adb-to-root kernel exploit (CVE-2026-43499 futex PI UAF)")
     print("  no kernel filter: --bin must match the target kernel")
     print("  authorized research on your own hardware only")
     print("*" * 70)

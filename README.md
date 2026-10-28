@@ -1,19 +1,20 @@
-# GhostLock PoC (CVE-2026-43499)
+# ghostlock-tv (CVE-2026-43499)
 
-adb-to-root kernel exploit runner for the onn 4K Pro Google TV
+adb-to-root kernel exploit chain for the onn 4K Pro Google TV
 (jarvis2). This is a kernel local privilege escalation: the
 unprivileged adb shell (uid 2000) fires a compiled exploit that turns
 the GhostLock futex PI use-after-free into a kernel write primitive
-and swaps its own credentials to uid 0, full caps. Target kernel:
-`ab14657224` (5.15.196-android14-11, pre-fix). Locked bootloader,
-verified boot green, dm-verity enforcing: root is per-boot, there is
-no persistence without breaking the boot chain.
+(rb_erase walks over freed waiters) and swaps its own credentials to
+uid 0, full caps. No unlock, no flashing, no signing keys: locked
+bootloader, verified boot green, dm-verity enforcing, and root anyway.
+Target kernel: `ab14657224` (5.15.196-android14-11, pre-fix). Root is
+per-boot; there is no persistence without breaking the boot chain.
 
 The full technical writeup (the port, the write primitive design,
 why the SELinux write is a pointer write, the reclaim environment,
 the delivery dead ends, the operational findings) is published at
-**<https://acheronsec.com/research/ghostlock-onn-4k-pro>**. Read it
-before running anything.
+**<https://acheronsec.com/research/adb-to-root-on-a-locked-android-tv>**.
+Read it before running anything.
 
 ## Repository
 
