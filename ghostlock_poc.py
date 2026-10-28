@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """GhostLock PoC runner - CVE-2026-43499 (futex PI use-after-free)
 
-General runner: no kernel filter. The exploit binary carries the
-offsets; you are responsible for pointing --bin at a build that matches
-the target kernel (see WRITEUP.md for the porting method).
+General runner: no kernel filter. No exploit binary is shipped; the
+exploit binary carries the offsets, so you are responsible for
+building one from the GhostLock family sources and pointing --bin at
+a build that matches the target kernel (see WRITEUP.md for the
+porting method and the family repo list).
 
 Run model:
   connect -> wait for adb authorization -> wait for boot ->
@@ -171,9 +173,9 @@ def main():
         description="GhostLock PoC runner (CVE-2026-43499 futex PI UAF)")
     p.add_argument("--host", required=True,
                    help="adb target host:port (e.g. 192.168.1.50:5555)")
-    p.add_argument("--bin", default="ghostlock_r18",
+    p.add_argument("--bin", required=True,
                    help="exploit binary built for the target kernel "
-                        "(default: ghostlock_r18)")
+                        "(this repo does not ship one)")
     p.add_argument("--rolls", type=int, default=6,
                    help="max exploit attempts (default 6)")
     p.add_argument("--settle", type=int, default=SETTLE_S,

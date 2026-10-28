@@ -4,7 +4,7 @@
 
 I wanted to know if the public GhostLock bug could be ported onto a locked, verified-boot consumer Android TV box, with no bootloader unlock, no factory image, and nothing but the public exploit family to work from. And then whether the box would still be a usable TV afterwards. The answer to the first question is yes, and it runs from a stock machine against the stock build. The answer to the second is no, and the reason why is the most interesting finding in this whole project.
 
-This work was verified end to end on hardware I own: a stock onn 4K Pro, verified boot green, bootloader locked, dm-verity enforcing, all system partitions stock. No system update was installed at any point during this work, which matters more than it sounds like it does, and I will get to that. The repository is deliberately small: the runner, this writeup, a readme, and the exploit binary on the releases page.
+This work was verified end to end on hardware I own: a stock onn 4K Pro, verified boot green, bootloader locked, dm-verity enforcing, all system partitions stock. No system update was installed at any point during this work, which matters more than it sounds like it does, and I will get to that. The repository is deliberately small: the runner, this writeup, a readme, and nothing else. The exploit binary is not distributed; anyone reproducing this builds it from the GhostLock family sources for their own target kernel.
 
 ## The target
 
@@ -200,15 +200,15 @@ The GhostLock family repos this port builds on: `NebuSec/CyberMeowfia` (the orig
 ## Repository contents for replicators
 
 - `ghostlock_poc.py`: the runner
-- `ghostlock_r18`: the exploit binary for build `ab14657224` (releases page)
 - `WRITEUP.md`: this document
 - `README.md`: reproduction and operational rules
+- the exploit binary: not distributed; build it from the GhostLock family sources (Related work) for your target kernel, then pass `--bin`
 
 ## Reproduction
 
 ```
 adb connect <device-ip>:5555       # click Allow on the TV popup
-python3 ghostlock_poc.py --host <device-ip>:5555 --bin ghostlock_r18
+python3 ghostlock_poc.py --host <device-ip>:5555 --bin <exploit-binary>
 ```
 
 Expect one to ten rolls with panic reboots survived between them, a root daemon on :13337, an interactive root shell through it, and a box that keeps answering on the network while the framework dies around it. The launcher is a separate question, and this document is the current answer to it: not yet, not on this build, and the reason is written down above.

@@ -14,21 +14,27 @@ architecture and its dead ends, and the operational findings.
 ## Repository
 
 - `ghostlock_poc.py` - the runner (Python 3, stdlib only, `adb` on PATH)
-- `ghostlock_r18` - exploit binary (aarch64, static), offsets for
-  `ab14657224`; get it from the releases page or build it from source
 - `WRITEUP.md` - the full technical writeup
+
+**No exploit binary is distributed.** The runner is an orchestrator
+only: it connects, fires the exploit, survives the panic reboots,
+verifies root, and drops into the shell. All the exploitation logic
+(the write primitive, the cred swap, the reclaim environment) lives in
+a compiled binary you must build yourself for the target kernel, from
+the GhostLock family sources listed in WRITEUP.md "Related work".
+Without a matching binary the runner cannot root anything.
 
 ## Usage
 
 ```
 adb connect <device-ip>:5555        # click Allow on the TV popup
-python3 ghostlock_poc.py --host <device-ip>:5555 --bin ghostlock_r18
+python3 ghostlock_poc.py --host <device-ip>:5555 --bin <exploit-binary>
 ```
 
 Flags:
 
-- `--bin PATH` - exploit binary (default `ghostlock_r18`). No kernel
-  filter: the binary must match the target kernel. An
+- `--bin PATH` - exploit binary built for the target kernel (required).
+  No kernel filter: the binary must match the target kernel. An
   unverified-offsets fire is not a miss, it is a brick lottery.
 - `--rolls N` - exploit attempt budget (default 6)
 - `--settle S` - seconds to settle after each panic reboot (default 45)
